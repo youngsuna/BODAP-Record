@@ -1,0 +1,8 @@
+{
+  "name": "Remix 보답 (BODAP)",
+  "description": "경조사 및 선물 상호 교환 장부, To-Do 리마인더와 관계별 마음 교환 밸런스를 관리하는 스마트 경조사 앱",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
