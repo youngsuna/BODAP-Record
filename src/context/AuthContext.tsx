@@ -113,6 +113,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await fbLogoutUser();
     } catch (err) {
       console.error('Logout error:', err);
+    } finally {
+      setUser(null);
     }
   };
 

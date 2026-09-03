@@ -258,31 +258,4 @@ export const INITIAL_RECORDS: RecordItem[] = [
   },
 ];
 
-export const INITIAL_NOTIFICATIONS: AppNotification[] = [
-  {
-    id: 'n-1',
-    title: 'D-3 결혼식 일정 리마인더',
-    message: '김서연 대리님의 결혼식이 3일 남았습니다. 추천 축의금 10만원을 준비해 보세요.',
-    time: '10분 전',
-    read: false,
-    type: 'd-day',
-    contactId: 'c-1',
-  },
-  {
-    id: 'n-2',
-    title: '보답 권장 알림 (4개월 경과)',
-    message: '박지훈 팀장님께서 보내주신 이직 축하 화환에 대한 보답을 기록해 보세요.',
-    time: '2시간 전',
-    read: false,
-    type: 'obligation',
-    contactId: 'c-2',
-  },
-  {
-    id: 'n-3',
-    title: '오프라인 캐시 자동 동기화',
-    message: '장부 42건의 최신 데이터가 브라우저 로컬 저장소에 안전하게 백업되었습니다.',
-    time: '오늘 09:00',
-    read: true,
-    type: 'sync',
-  },
-];
+export const INITIAL_NOTIFICATIONS: AppNotification[] = [];
