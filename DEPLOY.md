@@ -37,3 +37,17 @@ git push origin main
 - **GitHub Actions 워크플로우 (`.github/workflows/deploy.yml`)**: `main` 또는 `master` 브랜치에 푸시될 때마다 자동으로 Node.js 환경에서 최신 소스를 빌드하고 Pages에 배포합니다.
 - **수동 배포 스크립트 (`package.json`)**: 필요시 터미널에서 `npm run deploy` 명령어를 통해서도 배포할 수 있도록 `gh-pages` 설정이 추가되어 있습니다.
 - **SPA 404 리디렉션 처리 (`public/404.html`)**: 새로고침 시 404 오류가 발생하는 것을 방지하도록 구성되었습니다.
+
+---
+
+## 4. Google 로그인 사용 시 필수 설정 (Firebase 승인된 도메인 등록)
+
+깃허브 페이지(`https://<계정명>.github.io`)에서 Google 로그인을 사용하려면, Firebase 보안 정책에 따라 해당 도메인을 **승인된 도메인**에 등록해주어야 합니다:
+
+1. [Firebase 콘솔 설정 페이지](https://console.firebase.google.com/project/gen-lang-client-0941452046/authentication/settings)에 접속합니다.
+2. 상단 메뉴에서 **Authentication** > **설정(Settings)** 탭을 선택합니다.
+3. **승인된 도메인(Authorized domains)** 항목에서 **[도메인 추가]** 버튼을 클릭합니다.
+4. 본인의 깃허브 페이지 도메인 (예: `<사용자계정>.github.io`)을 입력하고 저장합니다.
+5. 저장 후 새로고침하시면 Google 로그인이 즉시 정상 동작합니다.
+*(참고: 이메일 회원가입 및 로그인은 도메인 등록과 무관하게 항상 바로 사용하실 수 있습니다.)*
+

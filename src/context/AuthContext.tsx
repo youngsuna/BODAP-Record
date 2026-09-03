@@ -60,6 +60,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return '네트워크 연결 상태를 확인해 주세요.';
         case 'auth/operation-not-allowed':
           return '해당 인증 방식이 활성화되지 않았습니다. 관리자 설정을 확인해 주세요.';
+        case 'auth/unauthorized-domain': {
+          const host = typeof window !== 'undefined' ? window.location.hostname : '현재 도메인';
+          return `Firebase 인증 승인 도메인 미등록 오류 (auth/unauthorized-domain): 현재 도메인 [${host}]이 Firebase 승인 도메인에 등록되지 않았습니다.`;
+        }
         default:
           return (err as { message?: string }).message || '인증 처리 중 오류가 발생했습니다.';
       }

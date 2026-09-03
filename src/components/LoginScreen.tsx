@@ -12,9 +12,52 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [passwordCheckedMessage, setPasswordCheckedMessage] = useState<{ isMatch: boolean; text: string } | null>(null);
   const [nickname, setNickname] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // 비밀번호 유효성 검사: 8자 이상, 숫자 포함, 특수문자 포함
+  const checkPasswordRules = (pwd: string) => {
+    const hasMinLength = pwd.length >= 8;
+    const hasNumber = /[0-9]/.test(pwd);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>\-_+=[\]\\/`~]/.test(pwd);
+    return {
+      hasMinLength,
+      hasNumber,
+      hasSpecial,
+      isValid: hasMinLength && hasNumber && hasSpecial,
+    };
+  };
+
+  const passwordRules = checkPasswordRules(password);
+
+  const handleCheckPasswordMatch = () => {
+    setLocalError(null);
+    if (!password) {
+      setPasswordCheckedMessage({ isMatch: false, text: '먼저 비밀번호를 입력해 주세요.' });
+      return;
+    }
+    if (!passwordRules.isValid) {
+      setPasswordCheckedMessage({
+        isMatch: false,
+        text: '비밀번호 규칙을 만족해야 합니다 (숫자+특수문자 포함 8자리 이상).',
+      });
+      return;
+    }
+    if (!passwordConfirm) {
+      setPasswordCheckedMessage({ isMatch: false, text: '비밀번호 확인란에 비밀번호를 다시 입력해 주세요.' });
+      return;
+    }
+    if (password !== passwordConfirm) {
+      setPasswordCheckedMessage({ isMatch: false, text: '비밀번호가 일치하지 않습니다.' });
+    } else {
+      setPasswordCheckedMessage({ isMatch: true, text: '비밀번호가 안전하며 일치합니다.' });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,11 +78,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
         setLocalError('닉네임은 2자 이상 입력해 주세요.');
         return;
       }
-    }
 
-    if (password.length < 6) {
-      setLocalError('비밀번호는 최소 6자 이상이어야 합니다.');
-      return;
+      if (!passwordRules.isValid) {
+        setLocalError('비밀번호는 숫자와 특수문자를 포함하여 8자리 이상이어야 합니다.');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        setLocalError('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        return;
+      }
+    } else {
+      if (password.length < 6) {
+        setLocalError('비밀번호를 올바르게 입력해 주세요.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -89,16 +142,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
           <span className="text-neutral-400 font-normal text-lg">·</span>
           <span className="font-semibold text-neutral-800 text-lg">보답</span>
         </h1>
-        <p className="text-[14px] text-neutral-500 mt-1 max-w-[280px] leading-relaxed">
-          경조사와 선물 상호 교환 장부, <br />
-          마음의 밸런스를 스마트하게 관리하세요
+        <p className="text-[14px] text-neutral-600 mt-2 max-w-[300px] leading-relaxed font-medium">
+          소중한 선물을 기록하고 잊지않고 보답하세요
         </p>
-
-        {/* Live Service Authentication Badge */}
-        <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-900 text-white text-[11px] font-medium tracking-wide">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-          <span>클라우드 실시간 동기화 (Firebase Auth)</span>
-        </div>
       </div>
 
       {/* Main Authentication Card */}
@@ -109,6 +155,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
             type="button"
             onClick={() => {
               setMode('login');
+              setPasswordConfirm('');
+              setPasswordCheckedMessage(null);
               setLocalError(null);
               clearError();
             }}
@@ -124,6 +172,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
             type="button"
             onClick={() => {
               setMode('register');
+              setPasswordConfirm('');
+              setPasswordCheckedMessage(null);
               setLocalError(null);
               clearError();
             }}
@@ -139,22 +189,72 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
 
         {/* Error Notice */}
         {activeError && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 flex items-start gap-2.5 text-left">
-            <span className="material-symbols-outlined text-red-500 text-[18px] shrink-0 mt-0.5">
-              error
-            </span>
-            <div className="text-[12px] text-red-700 leading-snug flex-1">
-              {activeError}
+          <div className="mb-4 p-3.5 rounded-xl bg-amber-50/90 border border-amber-200/90 text-left shadow-2xs">
+            <div className="flex items-start gap-2.5">
+              <span className="material-symbols-outlined text-amber-600 text-[19px] shrink-0 mt-0.5">
+                {activeError.includes('unauthorized-domain') ? 'domain_verification' : 'error'}
+              </span>
+              <div className="text-[12px] text-neutral-800 leading-snug flex-1">
+                {activeError}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setLocalError(null);
+                  clearError();
+                }}
+                className="text-neutral-400 hover:text-neutral-700 text-xs cursor-pointer p-0.5"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              onClick={() => {
-                setLocalError(null);
-                clearError();
-              }}
-              className="text-red-400 hover:text-red-600 text-xs cursor-pointer"
-            >
-              ✕
-            </button>
+
+            {activeError.includes('unauthorized-domain') && (
+              <div className="mt-3 pt-3 border-t border-amber-200/80 text-[11px] text-neutral-700 space-y-2">
+                <div className="font-bold text-amber-900 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[15px] text-amber-700">help</span>
+                  <span>도메인 승인 등록 방법 (1분 해결)</span>
+                </div>
+                <p className="text-neutral-600 leading-relaxed">
+                  Google 로그인은 보안상 <strong>Firebase 콘솔의 승인된 도메인 목록</strong>에 등록된 웹사이트 주소에서만 동작합니다.
+                </p>
+                <div className="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-amber-200">
+                  <span className="text-[11px] text-neutral-500 font-medium">등록할 도메인:</span>
+                  <code className="text-[12px] font-bold text-black select-all">
+                    {typeof window !== 'undefined' ? window.location.hostname : '도메인 확인 불가'}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        navigator.clipboard.writeText(window.location.hostname);
+                        alert(`도메인 주소 [${window.location.hostname}]가 복사되었습니다!`);
+                      }
+                    }}
+                    className="ml-auto px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-semibold text-[10px] cursor-pointer"
+                  >
+                    복사
+                  </button>
+                </div>
+                <div className="text-[11px] text-neutral-600 space-y-0.5 pl-1">
+                  <div>1. <strong>Firebase 콘솔</strong> &gt; <strong>Authentication</strong> &gt; <strong>설정</strong> 탭 클릭</div>
+                  <div>2. <strong>승인된 도메인</strong> 섹션에서 [<strong>도메인 추가</strong>] 클릭</div>
+                  <div>3. 위 복사한 도메인을 붙여넣고 저장하면 즉시 정상 작동합니다.</div>
+                </div>
+                <div className="pt-1 flex items-center gap-2">
+                  <a
+                    href="https://console.firebase.google.com/project/gen-lang-client-0941452046/authentication/settings"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-black text-white hover:bg-neutral-800 text-[11px] font-bold transition-all shadow-2xs"
+                  >
+                    <span>Firebase 콘솔 설정 바로가기</span>
+                    <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                  </a>
+                  <span className="text-[10px] text-neutral-500">또는 아래 이메일 가입/로그인은 즉시 사용 가능합니다.</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -234,22 +334,118 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-[12px] font-medium text-neutral-700">
-                비밀번호
+                비밀번호 {mode === 'register' && <span className="text-black font-semibold">*</span>}
               </label>
-              <span className="text-[11px] text-neutral-400">
-                6자 이상
+              <span className="text-[11px] text-neutral-500">
+                {mode === 'register' ? '숫자·특수문자 포함 8자 이상' : '비밀번호 입력'}
               </span>
             </div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-black focus:ring-1 focus:ring-black text-[14px] text-neutral-900 transition-colors"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordCheckedMessage(null);
+                }}
+                placeholder={mode === 'register' ? '영문, 숫자, 특수문자 조합 8자 이상' : '••••••••'}
+                required
+                minLength={mode === 'register' ? 8 : 6}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-black focus:ring-1 focus:ring-black text-[14px] text-neutral-900 transition-colors pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                title={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </span>
+              </button>
+            </div>
+
+            {/* Password requirement chips in registration mode */}
+            {mode === 'register' && (
+              <div className="flex flex-wrap gap-2 text-[11px] pt-1.5 pl-0.5">
+                <span className={`inline-flex items-center gap-1 ${passwordRules.hasMinLength ? 'text-emerald-600 font-semibold' : 'text-neutral-400'}`}>
+                  <span className="material-symbols-outlined text-[14px]">
+                    {passwordRules.hasMinLength ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
+                  8자리 이상
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordRules.hasNumber ? 'text-emerald-600 font-semibold' : 'text-neutral-400'}`}>
+                  <span className="material-symbols-outlined text-[14px]">
+                    {passwordRules.hasNumber ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
+                  숫자 포함
+                </span>
+                <span className={`inline-flex items-center gap-1 ${passwordRules.hasSpecial ? 'text-emerald-600 font-semibold' : 'text-neutral-400'}`}>
+                  <span className="material-symbols-outlined text-[14px]">
+                    {passwordRules.hasSpecial ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
+                  특수문자 포함
+                </span>
+              </div>
+            )}
           </div>
+
+          {/* Password Confirmation Field & Button (Register Mode) */}
+          {mode === 'register' && (
+            <div>
+              <label className="block text-[12px] font-medium text-neutral-700 mb-1">
+                비밀번호 확인 <span className="text-black font-semibold">*</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type={showPasswordConfirm ? 'text' : 'password'}
+                    value={passwordConfirm}
+                    onChange={(e) => {
+                      setPasswordConfirm(e.target.value);
+                      setPasswordCheckedMessage(null);
+                    }}
+                    placeholder="비밀번호를 한 번 더 입력해 주세요"
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-black focus:ring-1 focus:ring-black text-[14px] text-neutral-900 transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                    title={showPasswordConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPasswordConfirm ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCheckPasswordMatch}
+                  className="px-3.5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-[12px] font-bold shrink-0 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+                >
+                  비밀번호 확인
+                </button>
+              </div>
+
+              {/* Password Match Status Message */}
+              {passwordCheckedMessage && (
+                <div
+                  className={`mt-2 px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1.5 font-medium border ${
+                    passwordCheckedMessage.isMatch
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-red-50 text-red-600 border-red-200'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[15px]">
+                    {passwordCheckedMessage.isMatch ? 'check_circle' : 'cancel'}
+                  </span>
+                  <span>{passwordCheckedMessage.text}</span>
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"
@@ -274,7 +470,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
           <span className="material-symbols-outlined text-[14px] text-neutral-400">
             lock
           </span>
-          <span>Google Firebase 보안 인증 및 실시간 클라우드 DB 연동</span>
+          <span>안전한 보안 암호화 및 장부 데이터 보호</span>
         </div>
         <p>© 2026 BODAP. 경조사 교환 예절 및 상호 부조 장부 플랫폼</p>
       </div>
