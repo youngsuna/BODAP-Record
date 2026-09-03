@@ -6,7 +6,6 @@ interface LedgerScreenProps {
   onSelectContact: (contact: Contact) => void;
   onNavigate: (screen: ScreenType) => void;
   onOpenAddContact: () => void;
-  onOpenExcelImport: () => void;
 }
 
 export const LedgerScreen: React.FC<LedgerScreenProps> = ({
@@ -14,7 +13,6 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
   onSelectContact,
   onNavigate,
   onOpenAddContact,
-  onOpenExcelImport,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | '전체'>('전체');
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,31 +55,6 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
 
   return (
     <div className="flex flex-col w-full space-y-4 pb-20">
-      {/* Quick Action: Excel Batch Import Banner */}
-      <div className="bg-gradient-to-r from-emerald-50 to-neutral-50 border border-emerald-200/80 rounded-2xl p-3 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">table_chart</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[13px] font-bold text-neutral-900 leading-tight">
-              엑셀로 장부 일괄 등록
-            </span>
-            <span className="text-[11px] text-neutral-500">
-              표준 양식 다운로드 & 한 번에 가져오기
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={onOpenExcelImport}
-          className="px-3 py-1.5 rounded-xl bg-black text-white hover:bg-neutral-800 text-[12px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-        >
-          <span>엑셀 등록</span>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-        </button>
-      </div>
-
       {/* Search Bar */}
       <div className="relative">
         <span className="absolute left-3.5 top-3 material-symbols-outlined text-[20px] text-neutral-400">
@@ -364,31 +337,6 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
         >
           <span>추가</span>
           <span className="material-symbols-outlined text-[15px]">chevron_right</span>
-        </button>
-      </div>
-
-      {/* Excel Batch Import Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-neutral-100 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[20px]">table_chart</span>
-          </div>
-          <div className="flex flex-col">
-            <h4 className="text-[14px] font-bold text-neutral-900">
-              엑셀 장부 일괄 가져오기
-            </h4>
-            <span className="text-[12px] text-neutral-500">
-              표준 양식 다운로드 및 대량 기록 등록
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={onOpenExcelImport}
-          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
-        >
-          <span>가져오기</span>
-          <span className="material-symbols-outlined text-[15px]">upload</span>
         </button>
       </div>
     </div>

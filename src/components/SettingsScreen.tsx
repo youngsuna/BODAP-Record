@@ -5,9 +5,10 @@ import { purgeSampleDataFromFirestore } from '../lib/firebase';
 
 interface SettingsScreenProps {
   onNavigate?: (screen: string) => void;
+  onOpenExcelImport?: () => void;
 }
 
-export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onOpenExcelImport }) => {
   const { user, logout } = useAuth();
   const [offlineSync, setOfflineSync] = useState(true);
   const [pushNotification, setPushNotification] = useState(true);
@@ -211,11 +212,39 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
         </div>
       </section>
 
-      {/* Backup & Export */}
-      <section className="bg-white rounded-2xl p-4 shadow-sm border border-neutral-100 flex flex-col space-y-2">
+      {/* Backup, Import & Export */}
+      <section className="bg-white rounded-2xl p-4 shadow-sm border border-neutral-100 flex flex-col space-y-3">
         <h3 className="text-[15px] font-bold text-neutral-900">
-          데이터 관리 및 내보내기
+          데이터 관리 및 가져오기 / 내보내기
         </h3>
+
+        {/* Excel Batch Import Card */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-50/80 to-neutral-50 border border-emerald-200/80 flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+              <span className="material-symbols-outlined text-[20px]">table_chart</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[14px] font-bold text-neutral-900">
+                엑셀 장부 일괄 등록
+              </span>
+              <span className="text-[11px] text-neutral-500">
+                표준 양식(.xlsx) 다운로드 및 대량 장부 가져오기
+              </span>
+            </div>
+          </div>
+          {onOpenExcelImport && (
+            <button
+              type="button"
+              onClick={onOpenExcelImport}
+              className="px-3.5 py-2 rounded-xl bg-black hover:bg-neutral-800 text-white text-[12px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+            >
+              <span>가져오기</span>
+              <span className="material-symbols-outlined text-[15px]">upload</span>
+            </button>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 gap-2 pt-1">
           <button
             onClick={handleExportPDF}

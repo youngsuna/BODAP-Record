@@ -8,7 +8,6 @@ interface RecordEntryScreenProps {
   onSaveRecord: (newRecord: Omit<RecordItem, 'id'>) => void;
   onAddContact?: (contact: Contact) => void | Promise<void>;
   onNavigate: (screen: ScreenType) => void;
-  onOpenExcelImport?: () => void;
 }
 
 export const RecordEntryScreen: React.FC<RecordEntryScreenProps> = ({
@@ -17,7 +16,6 @@ export const RecordEntryScreen: React.FC<RecordEntryScreenProps> = ({
   onSaveRecord,
   onAddContact,
   onNavigate,
-  onOpenExcelImport,
 }) => {
   const initialContact = preselectedContactId
     ? contacts.find((c) => c.id === preselectedContactId) || null
@@ -401,25 +399,13 @@ export const RecordEntryScreen: React.FC<RecordEntryScreenProps> = ({
             보답 기록
           </h2>
         </div>
-        <div className="flex items-center gap-1.5">
-          {onOpenExcelImport && (
-            <button
-              type="button"
-              onClick={onOpenExcelImport}
-              className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
-            >
-              <span className="material-symbols-outlined text-[15px]">table_chart</span>
-              <span>엑셀 일괄 등록</span>
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => onNavigate('home')}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[20px]">close</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate('home')}
+          className="w-8 h-8 flex items-center justify-center rounded-full text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[20px]">close</span>
+        </button>
       </div>
 
       {/* Direction Toggle */}

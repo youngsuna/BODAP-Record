@@ -328,7 +328,6 @@ function MainApp() {
               onSelectContact={handleSelectContact}
               onNavigate={setCurrentScreen}
               onOpenAddContact={() => setIsAddContactOpen(true)}
-              onOpenExcelImport={() => setIsExcelImportOpen(true)}
             />
           )}
 
@@ -360,7 +359,6 @@ function MainApp() {
               onSaveRecord={handleSaveRecord}
               onAddContact={handleAddContact}
               onNavigate={setCurrentScreen}
-              onOpenExcelImport={() => setIsExcelImportOpen(true)}
             />
           )}
 
@@ -374,7 +372,10 @@ function MainApp() {
           )}
 
           {currentScreen === 'settings' && (
-            <SettingsScreen />
+            <SettingsScreen
+              onNavigate={setCurrentScreen}
+              onOpenExcelImport={() => setIsExcelImportOpen(true)}
+            />
           )}
         </main>
 
