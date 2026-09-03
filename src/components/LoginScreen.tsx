@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LOGO_URL } from '../data/initialData';
+import { Contacts, type ContactPayload } from '@capacitor-community/contacts';
+import { Capacitor } from '@capacitor/core';
 
 interface LoginScreenProps {
   onSuccess?: () => void;
@@ -35,6 +37,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
 
   const passwordRules = checkPasswordRules(password);
 
+  const [selectedContact, setSelectedContact] = useState<ContactPayload | null>(null);
+
   const handleCheckPasswordMatch = () => {
     setLocalError(null);
     if (!password) {
@@ -59,7 +63,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePickContact = async () => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        const result = await Contacts.pickContact({
+          projection: { name: true, phones: true },
+        });
+        if (result && result.contact) {
+          setSelectedContact(result.contact);
+        }
+      } else {
+        alert('연락처 기능은 Android, iOS, 웹에서만 지원됩니다.');
+      }
+    } catch (error) {
+      console.error('연락처 선택 중 오류:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLocalError(null);
     clearError();

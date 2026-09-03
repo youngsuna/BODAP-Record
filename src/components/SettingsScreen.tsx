@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { USER_PROFILE } from '../data/initialData';
 import { useAuth } from '../context/AuthContext';
 import { purgeSampleDataFromFirestore } from '../lib/firebase';
+import type { ScreenType } from '../types';
 
 interface SettingsScreenProps {
-  onNavigate?: (screen: string) => void;
+  onNavigate?: (screen: ScreenType) => void;
   onOpenExcelImport?: () => void;
 }
 
